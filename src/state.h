@@ -3,45 +3,45 @@
 #include <iostream>
 
 struct State {
-	int current_amount = 0;
+  int current_amount = 0;
 
-	int target_amount = 0;
-	int elapsed_time = 0;
+  int target_amount = 0;
+  int elapsed_time = 0;
 
-	struct Income {
-		int amount = 0;
-		double interval = 0;
-	} income;
+  struct Income {
+    int amount = 0;
+    double interval = 0;
+  } income;
 
-	struct UpgradeAmount {
-		int cost = 0;
-		int income_increase = 0;
+  struct UpgradeAmount {
+    int cost = 0;
+    int income_increase = 0;
 
-		double next_cost_multipler = 0.0;
+    double next_cost_multipler = 0.0;
 
-		struct MultiplyAmount {
-			// How many upgrades til amount is multipled
-			// 0 means next upgrade will multiply
-			// valid: 0~9
-			int upgrades = 0;
+    struct MultiplyAmount {
+      // How many upgrades til amount is multipled
+      // 0 means next upgrade will multiply
+      // valid: 0~9
+      int upgrades = 0;
 
-			double multiply = 0.0;
-		} multiply;
-	} upgrade_amount;
+      double multiply = 0.0;
+    } multiply;
+  } upgrade_amount;
 
-	struct UpgradeTime {
-		int cost = 0;
-		double income_shorten = 0.0;
+  struct UpgradeTime {
+    int cost = 0;
+    double income_shorten = 0.0;
 
-		double next_cost_multipler = 0.0;
-	} upgrade_time;
+    double next_cost_multipler = 0.0;
+  } upgrade_time;
 };
 
-void printState(const State& state) {
-	std::cout << "===== state =====" << std::endl;
-	std::cout << "  current amount: " << state.current_amount << std::endl;
-	std::cout << "  elapsed time: " << state.elapsed_time << std::endl;
-	std::cout << "  income amount: " << state.income.amount << std::endl;
-	std::cout << "  income interval: " << state.income.interval << std::endl;
-	std::cout << std::endl;
+void printState(const State &state) {
+  std::cout << "===== state =====" << std::endl;
+  std::cout << "  current amount: " << state.current_amount << std::endl;
+  std::cout << "  elapsed time: " << state.elapsed_time << std::endl;
+  std::cout << "  income amount: " << state.income.amount << std::endl;
+  std::cout << "  income interval: " << state.income.interval << std::endl;
+  std::cout << std::endl;
 }
