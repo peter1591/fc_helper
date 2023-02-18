@@ -24,12 +24,10 @@ namespace tree_details {
 
 bool childExplored(const Node::Child &child) {
   if (std::holds_alternative<Node::InvalidChild>(child)) {
-    return false;
+    return true;
   }
   return std::get<Node::ValidChild>(child) != nullptr;
 }
-
-} // namespace tree_details
 
 // Find an unexplored action, and perform that action.
 //
@@ -62,32 +60,58 @@ std::pair<Action, Node *> explore(State &state, Node &node) {
   return {Action::MAX_ACTION, nullptr};
 }
 
+} // namespace tree_details
+
+struct TraverseResult {
+  bool explored_new_node = false;
+  bool state_corrupted = false;
+};
+
 // Traverse the tree and find an unexplored action, and explore it.
-Action traverse(State &state, Node &root, std::mt19937 &rnd,
-                std::vector<Action> &history, int max_depth) {
+//
+// Returns false iff an invalid action is applied and state is now corrupted.
+TraverseResult traverse(State &state, Node &root, std::mt19937 &rnd,
+                        std::vector<Action> &history, int max_depth) {
   Node *node = &root;
   while (true) {
-    // If there's an unexplored action, explore it.
-    const auto [action, new_node] = explore(state, *node);
+    const auto [action, new_node] = tree_details::explore(state, *node);
     if (new_node) {
-      return action;
+      // Found an unexplored action, and applied it.
+      history.push_back(action);
+      return {
+          .explored_new_node = true,
+          .state_corrupted = false,
+      };
     }
+
+    assert(new_node == nullptr);
     if (action != Action::MAX_ACTION) {
-      // An invalid action was applied. state is corrupted. exit
-      return Action::MAX_ACTION;
+      // Unfortunately an invalid action was found. State is corrupted and we
+      // need to exit.
+      return {
+          .explored_new_node = false,
+          .state_corrupted = true,
+      };
     }
 
     if (max_depth == 0) {
       performAction(state, Action::END);
-      return Action::END;
+      history.push_back(Action::END);
+      return {
+          .explored_new_node = false,
+          .state_corrupted = false,
+      };
     }
 
     // If not, randomly choose an (explored) action.
     const int i = rnd() % (int)Action::MAX_NON_END_ACTION;
     const auto &child = node->children[i];
     if (std::holds_alternative<Node::InvalidChild>(child)) {
-      // unfortunately chose an invalid action; exit
-      return Action::MAX_ACTION;
+      // unfortunately randomly chose an invalid action; exit
+      return {
+          .explored_new_node = false,
+          .state_corrupted = true,
+      };
     }
     performAction(state, (Action)i);
     history.push_back((Action)i);
