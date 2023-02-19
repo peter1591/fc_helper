@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "proto:generate": "mkdir -p build && rm -rf build/* && protoc --plugin=protoc-gen-ng=$(which protoc-gen-ng) --ng_out=build/ -I ../../src/proto ../../src/proto/service.proto"
+    "proto:generate": "mkdir -p build && rm -rf build/* && protoc --plugin=protoc-gen-ng=$(which protoc-gen-ng) --ng_out=build/ -I ../../proto ../../proto/service.proto"
   },
   "private": true,
   "dependencies": {

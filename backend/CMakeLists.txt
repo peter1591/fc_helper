@@ -35,7 +35,7 @@ else()
 endif()
 
 # Proto file
-get_filename_component(proto "proto/service.proto" ABSOLUTE)
+get_filename_component(proto "../proto/service.proto" ABSOLUTE)
 get_filename_component(proto_path "${proto}" PATH)
 file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/proto)
 
