@@ -17,13 +17,14 @@ void waitUntil(State &state, const double until) {
   assert(state.income.amount > 0);
   assert(state.income.interval > 0);
 
-  // round-up of `rest` / `income.amount`
-  const int rounds = 1 + (rest - 1) / state.income.amount;
-  state.current_amount += state.income.amount * rounds;
-  state.elapsed_time += state.income.interval * rounds;
+	double income = state.income.amount / state.income.interval;
+	income += state.income.other_income_per_sec;
+	const double secs = rest / income;
+
+	state.current_amount += income * secs;
+	state.elapsed_time += secs;
 
 	if (state.current_amount < until) {
-		assert(false);
 		state.current_amount = until; // round-up in case
 	}
   assert(state.current_amount >= until);
