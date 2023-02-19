@@ -75,7 +75,7 @@ public:
       new_node_count.add(ret.explored_new_node);
 
       if (objective.check(current_state, history)) {
-				callback(objective.getBest());
+				callback(objective.best);
       }
     }
   }

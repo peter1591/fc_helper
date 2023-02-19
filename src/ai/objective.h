@@ -19,41 +19,30 @@ void printBestStrategy(const BestStrategy &v) {
   std::cout << std::endl;
 }
 
-class ObjectiveFirstReachTarget {
-public:
-  ObjectiveFirstReachTarget() { state_.elapsed_time = INT_MAX; }
+struct ObjectiveBase {
+	ObjectiveBase() { best.state.elapsed_time = INT_MAX; }
 
+	BestStrategy best;
+};
+
+struct ObjectiveFirstReachTarget : ObjectiveBase {
   // Return true iff this is the current best.
   bool check(const State &state, const std::vector<Action> &history) {
     if (state.current_amount < state.target_amount) {
       return false;
     }
 
-    if (state.elapsed_time >= state_.elapsed_time) {
+    if (state.elapsed_time >= best.state.elapsed_time) {
       return false;
     }
 
-    state_ = state;
-    history_ = history;
-    return true;
+		best.actions = history;
+		best.state = state;
+		return true;
   }
-
-  BestStrategy getBest() const {
-    return {
-        .state = state_,
-        .actions = history_,
-    };
-  }
-
-private:
-  State state_;
-  std::vector<Action> history_;
 };
 
-class ObjectiveFirstFinishAllUpgrades {
-public:
-  ObjectiveFirstFinishAllUpgrades() { state_.elapsed_time = INT_MAX; }
-
+struct ObjectiveFirstFinishAllUpgrades : ObjectiveBase {
   bool check(const State &state, const std::vector<Action> &history) {
     if (state.upgrade_amount.availables > 0) {
       return false;
@@ -62,23 +51,12 @@ public:
       return false;
     }
 
-    if (state.elapsed_time >= state_.elapsed_time) {
+    if (state.elapsed_time >= best.state.elapsed_time) {
       return false;
     }
 
-    state_ = state;
-    history_ = history;
+		best.state = state;
+		best.actions = history;
     return true;
   }
-
-  BestStrategy getBest() const {
-    return {
-        .state = state_,
-        .actions = history_,
-    };
-  }
-
-private:
-  State state_;
-  std::vector<Action> history_;
 };

@@ -141,21 +141,21 @@ void setupTuna(State &state) {
   state.upgrade_time.next_cost_multipler = 1.08;
 
   state.current_amount = 0;
-  state.income.amount = 52693 * UNIT_PRICE;
-  state.income.interval = 15.3;
+  state.income.amount = 152.59_K* UNIT_PRICE;
+  state.income.interval = 12.9;
   state.income.other_income_per_sec = getIncomePerSec(setupLobster) + getIncomePerSec(setupSardin);
   //setTargetForSeconds(3600 * 20, state);
   state.target_amount = 21.0_cc;
 
-  state.upgrade_amount.cost = 23.40_bb;
+  state.upgrade_amount.cost = 114.89_bb;
   state.upgrade_amount.onetime_cost = 0;
-  state.upgrade_amount.income_increase = 885 * UNIT_PRICE;
+  state.upgrade_amount.income_increase = 1632 * UNIT_PRICE;
   state.upgrade_amount.multiply.upgrades = 9;
   state.upgrade_amount.multiply.multiply = 1.2;
   state.upgrade_amount.availables = state.upgrade_amount.multiply.upgrades + 1;
 
-  state.upgrade_time.cost = 18.09_bb;
-  state.upgrade_time.income_shorten = 0.1;
+  state.upgrade_time.cost = 70.21_bb;
+  state.upgrade_time.income_shorten = 0.09;
   state.upgrade_time.availables = 10;
 }
 
