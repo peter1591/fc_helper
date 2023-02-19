@@ -36,11 +36,11 @@ public:
 	static constexpr int MAX_ITERATIONS = 10000000;
 
   void run(const AIRequest &request, Callback callback) {
-    assert(request.state.target_amount > 0);
-    ObjectiveFirstReachTarget objective;
+    //assert(request.state.target_amount > 0);
+    //ObjectiveFirstReachTarget objective;
 
-    //assert(request.state.target_amount == 0);
-    //ObjectiveFirstFinishAllUpgrades objective;
+    assert(request.state.target_amount == 0);
+    ObjectiveFirstFinishAllUpgrades objective;
 
     HitCountSlidingWindow<HIT_COUNT_WINDOW_SIZE> new_node_count;
 
