@@ -9,13 +9,16 @@ inline long double operator""_B(long double v) { return v * 1e9; }
 inline long double operator""_T(long double v) { return v * 1e12; }
 inline long double operator""_aa(long double v) { return v * 1e15; }
 inline long double operator""_bb(long double v) { return v * 1e18; }
+inline long double operator""_cc(long double v) { return v * 1e21; }
 
 std::string numberToStr(long double v) {
   std::stringstream ss;
   ss.precision(2);
-	ss << std::fixed;
+  ss << std::fixed;
 
-  if (v >= 1.0_bb) {
+  if (v >= 1.0_cc) {
+    ss << v / 1.0_cc << "cc";
+  } else if (v >= 1.0_bb) {
     ss << v / 1.0_bb << "bb";
   } else if (v >= 1.0_aa) {
     ss << v / 1.0_aa << "aa";

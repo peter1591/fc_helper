@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+message RunRequest { int32 rand_seed = 1; }
+
+message RunResponse { int32 iteration = 1; }
+
+service AIService {
+  rpc run(RunRequest) returns (stream RunResponse) {}
+}
