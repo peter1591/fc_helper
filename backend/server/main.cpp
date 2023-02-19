@@ -29,11 +29,6 @@ class ServiceImpl : public AIService::Service {
 };
 
 int main(void) {
-  std::cout << "hi server" << std::endl;
-  RunRequest req;
-  req.set_rand_seed(30);
-  std::cout << "req:\n" << req.DebugString() << std::endl;
-
   ServiceImpl impl;
 
   ServerBuilder builder;

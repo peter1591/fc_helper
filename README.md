@@ -1,13 +1,20 @@
-# Build
+# Backend
 
+## Build
 ```
 mkdir -p ./build
 cd ./build
-cmake ../src
+cmake ../backend
 make
 ```
 
-# Clean
+## Run
+```
+cd ./build
+./server
+```
+
+## Clean
 ```
 rm -rf ./build
 ```
