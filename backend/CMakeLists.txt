@@ -5,6 +5,9 @@ project(HelloWorld CXX)
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 set(CMAKE_CXX_FLAGS "-O3")
 
+# Project root
+include_directories(".")
+
 # This branch assumes that gRPC and all its dependencies are already installed
 # on this system, so they can be located by find_package().
 

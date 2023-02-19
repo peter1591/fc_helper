@@ -7,6 +7,10 @@
 
 using namespace grpc;
 
+using wiring::AIService;
+using wiring::RunRequest;
+using wiring::RunResponse;
+
 int main(void) {
 	std::cout << "client\n";
 

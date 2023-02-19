@@ -2,27 +2,26 @@
 
 #include <grpcpp/grpcpp.h>
 
+#include "ai/ai.h"
 #include "proto/service.grpc.pb.h"
 #include "proto/service.pb.h"
+#include "proto_utils.h"
 
 using namespace grpc;
 
+using wiring::AIService;
+using wiring::RunRequest;
+using wiring::RunResponse;
+
 class ServiceImpl : public AIService::Service {
   Status run(ServerContext *, const RunRequest *req,
-			ServerWriter< RunResponse> *resWriter) override {
+             ServerWriter<RunResponse> *resWriter) override {
     std::cout << "run() called with req:\n" << req->DebugString() << std::endl;
 
-		RunResponse res;
-    res.set_iteration(42);
-		resWriter->Write(res);
-
-		sleep(1);
-    res.set_iteration(43);
-		resWriter->Write(res);
-
-		sleep(5);
-    res.set_iteration(44);
-		resWriter->Write(res);
+    AI ai;
+    ai.run(toAiRequest(*req), [&](const AIResult &aiResult) {
+      resWriter->Write(fromAiResult(aiResult));
+    });
 
     return Status::OK;
   }
@@ -39,6 +38,6 @@ int main(void) {
   std::cout << "Starting server." << std::endl;
   server->Wait();
 
-	std::cout << "Server stopped." << std::endl;
+  std::cout << "Server stopped." << std::endl;
   return 0;
 }

@@ -1,8 +1,86 @@
 syntax = "proto3";
 
-message RunRequest { int32 rand_seed = 1; }
+package wiring;
 
-message RunResponse { int32 iteration = 1; }
+message State {
+  double current_amount = 1;
+
+  double target_amount = 2;
+  double elapsed_time = 3;
+
+  message Income {
+    double amount = 1;
+    double interval = 2;
+
+    double other_income_per_sec = 3;
+  }
+  Income income = 4;
+
+  message UpgradeAmount {
+    double cost = 1;
+    double income_increase = 2;
+
+    double next_cost_multipler = 3;
+
+    // E.g., upgrade building so we can upgrade
+    double onetime_cost = 4;
+
+    message MultiplyAmount {
+      // How many upgrades til amount is multipled
+      // 0 means next upgrade will multiply
+      // valid: 0~9
+      int32 upgrades = 1;
+
+      double multiply = 2;
+    }
+    MultiplyAmount multiply = 5;
+
+    int32 availables = 6;
+  }
+  UpgradeAmount upgrade_amount = 5;
+
+  message UpgradeTime {
+    double cost = 1;
+    double income_shorten = 2;
+
+    double next_cost_multipler = 3;
+
+    int32 availables = 4;
+  }
+  UpgradeTime upgrade_time = 6;
+}
+
+message RunRequest {
+  State state = 1;
+  int64 rand_seed = 2;
+  int64 iteration_report_interval = 3;
+}
+
+message RunResponse {
+  message BestStrategy {
+    State state = 1;
+
+    enum Action {
+      ACTION_UNSET = 0;
+      UPGRADE_AMOUNT = 1;
+      UPGRADE_TIME = 2;
+      END = 3;
+    }
+    repeated Action actions = 2;
+  }
+
+  message ProgressInfo {
+    int64 iteration = 1;
+
+    int64 new_node_count = 2;
+    int64 new_node_count_max = 3;
+  }
+
+  oneof response {
+    BestStrategy best_strategy = 1;
+    ProgressInfo progress_info = 2;
+  }
+}
 
 service AIService {
   rpc run(RunRequest) returns (stream RunResponse) {}
