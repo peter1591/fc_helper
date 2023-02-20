@@ -2,6 +2,7 @@ import {Component} from '@angular/core';
 import {FormControl} from '@angular/forms';
 
 import {State} from '../../../build/service.pb'
+import {StateService} from '../state.service';
 
 export const UNIT_K = 1e3;
 export const UNIT_M = 1e6;
@@ -105,9 +106,17 @@ export class GamestateComponent {
   upgradeTimeCost = new FormControl<string>("");
   upgradeTimeIncomeShorten = new FormControl<string>("");
 
-  setState(state: State, unit_price: number) {
-    this.unitPrice.setValue(fromNumber(unit_price));
-    this.incomeUnits.setValue(fromNumber(state.income!.amount / unit_price));
+  constructor(
+      private stateService: StateService,
+  ) {
+    this.stateService.setStateGetter(this.buildState.bind(this));
+    this.stateService.stateSet$.subscribe(state => this.setState(state))
+  }
+
+  setState(state: State) {
+    this.unitPrice.setValue(fromNumber(this.stateService.UNIT_PRICE));
+    this.incomeUnits.setValue(
+        fromNumber(state.income!.amount / this.stateService.UNIT_PRICE));
     this.incomeInterval.setValue(fromNumber(state.income!.interval));
     this.upgradeAmount_cost.setValue(fromNumber(state.upgradeAmount!.cost));
     this.upgradeAmount_oneTimeCost.setValue(

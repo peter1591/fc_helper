@@ -6,7 +6,6 @@ import {RunRequest, RunResponse, State} from '../../build/service.pb'
 import {AIServiceClient} from '../../build/service.pbsc';
 
 import {
-  GamestateComponent,
   UNIT_aa,
   UNIT_B,
   UNIT_bb,
@@ -15,6 +14,7 @@ import {
   UNIT_M,
   UNIT_T,
 } from './gamestate/gamestate.component';
+import {StateService} from './state.service';
 
 @Component({
   selector : 'app-root',
@@ -24,17 +24,17 @@ import {
 export class AppComponent {
   title = 'web';
 
-  @ViewChild(GamestateComponent) private gamestate!: GamestateComponent;
-
   msgs: string[] = [];
   bestActions: RunResponse.BestStrategy.Action[] = [];
 
   constructor(
       private client: AIServiceClient,
+      private stateService: StateService,
   ) {}
 
   ngAfterViewInit() {
     const UNIT_PRICE = 511.12 * UNIT_bb / 7250;
+		this.stateService.UNIT_PRICE = UNIT_PRICE;
 
     var state = new State();
     state.income = new State.Income();
@@ -52,12 +52,15 @@ export class AppComponent {
     state.upgradeTime.cost = 8.3 * UNIT_cc;
     state.upgradeTime.incomeShorten = 0.6;
 
-    this.gamestate.setState(state, UNIT_PRICE);
+    // This assumes the gamestate component is already initialized, so this
+    // initial state will be reflected on UI. Thus this is only called in
+    // `ngAfterViewInit`.
+    this.stateService.setState(state);
   }
 
   sendRequest() {
     const request = new RunRequest();
-    request.state = this.gamestate.buildState();
+    request.state = this.stateService.getState();
     request.randSeed = 42;
     request.iterationReportInterval = 1000000;
 
