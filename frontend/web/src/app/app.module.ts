@@ -7,9 +7,10 @@ import {GrpcWebClientModule} from '@ngx-grpc/grpc-web-client';
 
 import {AppComponent} from './app.component';
 import {GamestateComponent} from './gamestate/gamestate.component';
+import { PresetsComponent } from './presets/presets.component';
 
 @NgModule({
-  declarations : [ AppComponent, GamestateComponent ],
+  declarations : [ AppComponent, GamestateComponent, PresetsComponent ],
   imports : [
     BrowserModule,
     FormsModule,
