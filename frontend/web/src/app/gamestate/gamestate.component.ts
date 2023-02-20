@@ -3,15 +3,15 @@ import {FormControl} from '@angular/forms';
 
 import {State} from '../../../build/service.pb'
 
-const UNIT_K = 1e3;
-const UNIT_M = 1e6;
-const UNIT_B = 1e9;
-const UNIT_T = 1e12;
-const UNIT_aa = 1e15;
-const UNIT_bb = 1e18;
-const UNIT_cc = 1e21;
+export const UNIT_K = 1e3;
+export const UNIT_M = 1e6;
+export const UNIT_B = 1e9;
+export const UNIT_T = 1e12;
+export const UNIT_aa = 1e15;
+export const UNIT_bb = 1e18;
+export const UNIT_cc = 1e21;
 
-function parseNumber(s: string|null): number {
+export function parseNumber(s: string|null): number {
   if (s == null) {
     throw new Error("failed to parse: s is null");
   }
@@ -68,6 +68,27 @@ function parseNumber(s: string|null): number {
   return v * unit;
 }
 
+export function fromNumber(v: number) {
+  let formatNumber = (v: number) => v.toFixed(2);
+
+  if (v >= UNIT_cc) {
+    return formatNumber(v / UNIT_cc) + "c";
+  } else if (v >= UNIT_bb) {
+    return formatNumber(v / UNIT_bb) + "b";
+  } else if (v >= UNIT_aa) {
+    return formatNumber(v / UNIT_aa) + "a";
+  } else if (v >= UNIT_T) {
+    return formatNumber(v / UNIT_T) + "T";
+  } else if (v >= UNIT_B) {
+    return formatNumber(v / UNIT_B) + "B";
+  } else if (v >= UNIT_M) {
+    return formatNumber(v / UNIT_M) + "M";
+  } else if (v >= UNIT_K) {
+    return formatNumber(v / UNIT_K) + "K";
+  }
+  return formatNumber(v);
+}
+
 @Component({
   selector : 'app-gamestate',
   templateUrl : './gamestate.component.html',
@@ -84,7 +105,7 @@ export class GamestateComponent {
   upgradeTimeCost = new FormControl<string>("");
   upgradeTimeIncomeShorten = new FormControl<string>("");
 
-	constructor() {
+  constructor() {
     const UNIT_PRICE = 511.12 * UNIT_bb / 7250;
     this.unitPrice.setValue(String(UNIT_PRICE));
     this.incomeUnits.setValue("6194");
@@ -95,7 +116,14 @@ export class GamestateComponent {
     this.upgradeAmountMultiplyMultiply.setValue("9");
     this.upgradeTimeCost.setValue("8.3c");
     this.upgradeTimeIncomeShorten.setValue("0.6");
-	}
+  }
+
+  setState(state: State, unit_price: number) {
+    this.unitPrice.setValue(fromNumber(unit_price));
+    this.incomeUnits.setValue(fromNumber(state.income!.amount / unit_price));
+    this.upgradeAmountMultiplyMultiply.setValue(
+        fromNumber(state.upgradeAmount!.multiply!.multiply));
+  }
 
   buildState() {
     var state = new State();
@@ -132,5 +160,4 @@ export class GamestateComponent {
 
     return state;
   }
-
 }
