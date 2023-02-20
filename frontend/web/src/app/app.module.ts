@@ -15,7 +15,7 @@ import { ServiceWorkerModule } from '@angular/service-worker';
     ReactiveFormsModule,
     GrpcCoreModule.forRoot(),
     GrpcWebClientModule.forRoot({
-      settings : {host : 'http://192.168.1.10:5782'},
+      settings : {host : 'http://lilyss.ddns.net:5782'},
     }),
     ServiceWorkerModule.register('ngsw-worker.js', {
       enabled: !isDevMode(),

@@ -145,7 +145,7 @@ void setupTuna(State &state) {
   state.income.interval = 12.9;
   state.income.other_income_per_sec = getIncomePerSec(setupLobster) + getIncomePerSec(setupSardin);
   //setTargetForSeconds(3600 * 20, state);
-  state.target_amount = 21.0_cc;
+  //state.target_amount = 21.0_cc;
 
   state.upgrade_amount.cost = 114.89_bb;
   state.upgrade_amount.onetime_cost = 0;

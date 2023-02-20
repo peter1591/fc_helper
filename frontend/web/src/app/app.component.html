@@ -33,6 +33,6 @@
   </ng-container>
 </div>
 
-<div *ngFor="let msg of msgs.reverse()">
-  <div>{{ msg }}</div>
+<div *ngFor="let msg of msgs.slice().reverse()">
+  <li>{{ msg }}</li>
 </div>
