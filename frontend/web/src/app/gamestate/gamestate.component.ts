@@ -105,24 +105,20 @@ export class GamestateComponent {
   upgradeTimeCost = new FormControl<string>("");
   upgradeTimeIncomeShorten = new FormControl<string>("");
 
-  constructor() {
-    const UNIT_PRICE = 511.12 * UNIT_bb / 7250;
-    this.unitPrice.setValue(String(UNIT_PRICE));
-    this.incomeUnits.setValue("6194");
-    this.incomeInterval.setValue("27.3");
-    this.upgradeAmount_cost.setValue("7.66c");
-    this.upgradeAmount_oneTimeCost.setValue("0");
-    this.upgradeAmountMultiplyUpgrades.setValue("9");
-    this.upgradeAmountMultiplyMultiply.setValue("9");
-    this.upgradeTimeCost.setValue("8.3c");
-    this.upgradeTimeIncomeShorten.setValue("0.6");
-  }
-
   setState(state: State, unit_price: number) {
     this.unitPrice.setValue(fromNumber(unit_price));
     this.incomeUnits.setValue(fromNumber(state.income!.amount / unit_price));
+    this.incomeInterval.setValue(fromNumber(state.income!.interval));
+    this.upgradeAmount_cost.setValue(fromNumber(state.upgradeAmount!.cost));
+    this.upgradeAmount_oneTimeCost.setValue(
+        fromNumber(state.upgradeAmount!.onetimeCost));
+    this.upgradeAmountMultiplyUpgrades.setValue(
+        fromNumber(state.upgradeAmount!.multiply!.upgrades));
     this.upgradeAmountMultiplyMultiply.setValue(
         fromNumber(state.upgradeAmount!.multiply!.multiply));
+    this.upgradeTimeCost.setValue(fromNumber(state.upgradeTime!.cost));
+    this.upgradeTimeIncomeShorten.setValue(
+        fromNumber(state.upgradeTime!.incomeShorten));
   }
 
   buildState() {

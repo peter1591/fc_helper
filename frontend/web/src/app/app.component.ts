@@ -34,7 +34,7 @@ export class AppComponent {
   ) {}
 
   ngAfterViewInit() {
-  const UNIT_PRICE = 511.12 * UNIT_bb / 7250;
+    const UNIT_PRICE = 511.12 * UNIT_bb / 7250;
 
     var state = new State();
     state.income = new State.Income();
