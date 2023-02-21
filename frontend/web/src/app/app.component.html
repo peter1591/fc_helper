@@ -1,10 +1,13 @@
 <app-gamestate></app-gamestate>
+<mat-divider></mat-divider>
 <app-presets></app-presets>
+<mat-divider></mat-divider>
 
 <button type="button" (click)="sendRequest()">
   Start
 </button>
 
+<mat-divider></mat-divider>
 <div>
   Best actions:
   <ng-container *ngFor="let action of bestActions">

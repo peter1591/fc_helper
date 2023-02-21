@@ -1,6 +1,18 @@
-<p>
-  Save name <input type="text" [formControl]="saveName" />
-  <button (click)="onSave()">Save</button>
-  <button (click)="onLoad()">Load</button>
-	{{ msg }}
-</p>
+<mat-form-field>
+  <mat-label>Save Name</mat-label>
+  <input
+    matInput
+    type="text"
+    [formControl]="saveName"
+    [matAutocomplete]="auto"
+    matInput
+  />
+  <mat-autocomplete #auto="matAutocomplete">
+    <mat-option *ngFor="let option of options" [value]="option">
+      {{ option }}
+    </mat-option>
+  </mat-autocomplete>
+</mat-form-field>
+<button mat-raised-button (click)="onSave()">Save</button>
+<button mat-raised-button (click)="onLoad()">Load</button>
+{{ msg }}

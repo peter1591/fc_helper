@@ -34,6 +34,8 @@ export class PresetsComponent {
   saveName = new FormControl<string>("default");
   msg = "";
 
+	options = ['asd', 'sdf', 'dfg'];
+
   ngAfterViewInit() {
     var building = new Building();
     building.income = new Building.Income();
