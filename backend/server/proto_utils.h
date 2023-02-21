@@ -2,27 +2,27 @@
 #include "ai/state.h"
 #include "proto/service.pb.h"
 
-void toProtoStateIncome(const State::Income &in, wiring::State::Income &out) {
+void toProtoStateIncome(const State::Income &in, wiring::Building::Income &out) {
   out.set_amount(in.amount);
   out.set_interval(in.interval);
   out.set_other_income_per_sec(in.other_income_per_sec);
 }
 
-void fromProtoStateIncome(const wiring::State::Income &in, State::Income &out) {
+void fromProtoStateIncome(const wiring::Building::Income &in, State::Income &out) {
   out.amount = in.amount();
   out.interval = in.interval();
   out.other_income_per_sec = in.other_income_per_sec();
 }
 
 void toProtoStateUpgradeAmount(const State::UpgradeAmount &in,
-                               wiring::State::UpgradeAmount &out) {
+                               wiring::Building::UpgradeAmount &out) {
   out.set_cost(in.cost);
   out.set_income_increase(in.income_increase);
   out.set_next_cost_multipler(in.next_cost_multipler);
   out.set_onetime_cost(in.onetime_cost);
 
   [](const State::UpgradeAmount::MultiplyAmount &in,
-     wiring::State::UpgradeAmount::MultiplyAmount &out) {
+     wiring::Building::UpgradeAmount::MultiplyAmount &out) {
     out.set_upgrades(in.upgrades);
     out.set_multiply(in.multiply);
   }(in.multiply, *out.mutable_multiply());
@@ -30,14 +30,14 @@ void toProtoStateUpgradeAmount(const State::UpgradeAmount &in,
   out.set_availables(in.availables);
 }
 
-void fromProtoStateUpgradeAmount(const wiring::State::UpgradeAmount &in,
+void fromProtoStateUpgradeAmount(const wiring::Building::UpgradeAmount &in,
                                  State::UpgradeAmount &out) {
   out.cost = in.cost();
   out.income_increase = in.income_increase();
   out.next_cost_multipler = in.next_cost_multipler();
   out.onetime_cost = in.onetime_cost();
 
-  [](const wiring::State_UpgradeAmount::MultiplyAmount &in,
+  [](const wiring::Building_UpgradeAmount::MultiplyAmount &in,
      State::UpgradeAmount::MultiplyAmount &out) {
     out.upgrades = in.upgrades();
     out.multiply = in.multiply();
@@ -47,14 +47,14 @@ void fromProtoStateUpgradeAmount(const wiring::State::UpgradeAmount &in,
 }
 
 void toProtoStateUpgradeTime(const State::UpgradeTime &in,
-                             wiring::State::UpgradeTime &out) {
+                             wiring::Building::UpgradeTime &out) {
   out.set_cost(in.cost);
   out.set_income_shorten(in.income_shorten);
   out.set_next_cost_multipler(in.next_cost_multipler);
   out.set_availables(in.availables);
 }
 
-void fromProtoStateUpgradeTime(const wiring::State::UpgradeTime &in,
+void fromProtoStateUpgradeTime(const wiring::Building::UpgradeTime &in,
                                State::UpgradeTime &out) {
   out.cost = in.cost();
   out.income_shorten = in.income_shorten();
@@ -62,7 +62,7 @@ void fromProtoStateUpgradeTime(const wiring::State::UpgradeTime &in,
   out.availables = in.availables();
 }
 
-void toProtoState(const State &in, wiring::State &out) {
+void toProtoState(const State &in, wiring::Building &out) {
   out.set_current_amount(in.current_amount);
   out.set_target_amount(in.target_amount);
   out.set_elapsed_time(in.elapsed_time);
@@ -72,7 +72,7 @@ void toProtoState(const State &in, wiring::State &out) {
   toProtoStateUpgradeTime(in.upgrade_time, *out.mutable_upgrade_time());
 }
 
-void fromProtoState(const wiring::State &in, State &out) {
+void fromProtoState(const wiring::Building &in, State &out) {
   out.current_amount = in.current_amount();
   out.target_amount = in.target_amount();
   out.elapsed_time = in.elapsed_time();
@@ -84,7 +84,23 @@ void fromProtoState(const wiring::State &in, State &out) {
 
 AIRequest toAiRequest(const wiring::RunRequest &in) {
   AIRequest out;
-  fromProtoState(in.state(), out.state);
+
+	bool found = false;
+	for (const auto& building : in.state().buildings()) {
+		if (building.name() != in.objective().building_name()) {
+			continue;
+		}
+		if (found) {
+			throw std::runtime_error("more than two buildings with the same name");
+		}
+
+		fromProtoState(building, out.state);
+		found = true;
+	}
+	if (!found) {
+		throw std::runtime_error("couldn't find building with objective name");
+	}
+
   out.rand_seed = in.rand_seed();
   out.iteration_report_interval = in.iteration_report_interval();
   return out;
@@ -107,11 +123,10 @@ wiring::RunResponse fromAiResult(const AIResult &in) {
   wiring::RunResponse out;
   if (std::holds_alternative<BestStrategy>(in)) {
     [](const BestStrategy &in, wiring::RunResponse::BestStrategy &out) {
-      toProtoState(in.state, *out.mutable_state());
-
       for (const Action action : in.actions) {
         out.mutable_actions()->Add(toProtoAction(action));
       }
+			toProtoState(in.state, *out.mutable_building());
     }(std::get<BestStrategy>(in), *out.mutable_best_strategy());
   } else if (std::holds_alternative<AIProgressInfo>(in)) {
     [](const AIProgressInfo &in, wiring::RunResponse::ProgressInfo &out) {

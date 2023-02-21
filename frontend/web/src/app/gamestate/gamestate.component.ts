@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {FormControl} from '@angular/forms';
 
-import {State} from '../../../build/service.pb'
+import {State, Building} from '../../../build/service.pb'
 import {StateService} from '../state.service';
 
 export const UNIT_K = 1e3;
@@ -114,55 +114,58 @@ export class GamestateComponent {
   }
 
   setState(state: State) {
+		const building = state.buildings![0];
     this.unitPrice.setValue(fromNumber(this.stateService.UNIT_PRICE));
     this.incomeUnits.setValue(
-        fromNumber(state.income!.amount / this.stateService.UNIT_PRICE));
-    this.incomeInterval.setValue(fromNumber(state.income!.interval));
-    this.upgradeAmount_cost.setValue(fromNumber(state.upgradeAmount!.cost));
+        fromNumber(building.income!.amount / this.stateService.UNIT_PRICE));
+    this.incomeInterval.setValue(fromNumber(building.income!.interval));
+    this.upgradeAmount_cost.setValue(fromNumber(building.upgradeAmount!.cost));
     this.upgradeAmount_oneTimeCost.setValue(
-        fromNumber(state.upgradeAmount!.onetimeCost));
+        fromNumber(building.upgradeAmount!.onetimeCost));
     this.upgradeAmountMultiplyUpgrades.setValue(
-        fromNumber(state.upgradeAmount!.multiply!.upgrades));
+        fromNumber(building.upgradeAmount!.multiply!.upgrades));
     this.upgradeAmountMultiplyMultiply.setValue(
-        fromNumber(state.upgradeAmount!.multiply!.multiply));
-    this.upgradeTimeCost.setValue(fromNumber(state.upgradeTime!.cost));
+        fromNumber(building.upgradeAmount!.multiply!.multiply));
+    this.upgradeTimeCost.setValue(fromNumber(building.upgradeTime!.cost));
     this.upgradeTimeIncomeShorten.setValue(
-        fromNumber(state.upgradeTime!.incomeShorten));
+        fromNumber(building.upgradeTime!.incomeShorten));
   }
 
   buildState() {
-    var state = new State();
-    state.currentAmount = 0;
+		var building = new Building();
+    building.currentAmount = 0;
 
-    state.targetAmount = 0;
-    state.elapsedTime = 0;
+    building.targetAmount = 0;
+    building.elapsedTime = 0;
 
     const UNIT_PRICE = parseNumber(this.unitPrice.value);
 
-    state.income = new State.Income();
-    state.income.amount = parseNumber(this.incomeUnits.value) * UNIT_PRICE;
-    state.income.interval = parseNumber(this.incomeInterval.value);
-    state.income.otherIncomePerSec = 0;
+    building.income = new Building.Income();
+    building.income.amount = parseNumber(this.incomeUnits.value) * UNIT_PRICE;
+    building.income.interval = parseNumber(this.incomeInterval.value);
+    building.income.otherIncomePerSec = 0;
 
-    state.upgradeAmount = new State.UpgradeAmount();
-    state.upgradeAmount.cost = parseNumber(this.upgradeAmount_cost.value);
-    state.upgradeAmount.nextCostMultipler = 1.08;
-    state.upgradeAmount.onetimeCost =
+    building.upgradeAmount = new Building.UpgradeAmount();
+    building.upgradeAmount.cost = parseNumber(this.upgradeAmount_cost.value);
+    building.upgradeAmount.nextCostMultipler = 1.08;
+    building.upgradeAmount.onetimeCost =
         parseNumber(this.upgradeAmount_oneTimeCost.value);
-    state.upgradeAmount.multiply = new State.UpgradeAmount.MultiplyAmount();
-    state.upgradeAmount.multiply.upgrades =
+    building.upgradeAmount.multiply = new Building.UpgradeAmount.MultiplyAmount();
+    building.upgradeAmount.multiply.upgrades =
         parseNumber(this.upgradeAmountMultiplyUpgrades.value);
-    state.upgradeAmount.multiply.multiply =
+    building.upgradeAmount.multiply.multiply =
         parseNumber(this.upgradeAmountMultiplyMultiply.value);
-    state.upgradeAmount.availables = state.upgradeAmount.multiply.upgrades + 1;
+    building.upgradeAmount.availables = building.upgradeAmount.multiply.upgrades + 1;
 
-    state.upgradeTime = new State.UpgradeTime();
-    state.upgradeTime.cost = parseNumber(this.upgradeTimeCost.value);
-    state.upgradeTime.incomeShorten =
+    building.upgradeTime = new Building.UpgradeTime();
+    building.upgradeTime.cost = parseNumber(this.upgradeTimeCost.value);
+    building.upgradeTime.incomeShorten =
         parseNumber(this.upgradeTimeIncomeShorten.value);
-    state.upgradeTime.nextCostMultipler = 1.08;
-    state.upgradeTime.availables = 10;
+    building.upgradeTime.nextCostMultipler = 1.08;
+    building.upgradeTime.availables = 10;
 
+    var state = new State();
+		state.buildings = [building];
     return state;
   }
 }

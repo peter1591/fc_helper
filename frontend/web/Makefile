@@ -1,9 +1,11 @@
-all:
-	npm run proto:generate
+all: proto
 	ng build
+
+proto:
+	npm run proto:generate
 
 dist:
 	rm -rf /var/www/html/*
 	cp -R dist/web/* /var/www/html/
 
-.PHONY: dist
+.PHONY: dist proto

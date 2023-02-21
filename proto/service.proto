@@ -2,7 +2,10 @@ syntax = "proto3";
 
 package wiring;
 
-message State {
+// Next ID: 8
+message Building {
+  string name = 7;
+
   double current_amount = 1;
 
   double target_amount = 2;
@@ -50,23 +53,29 @@ message State {
   UpgradeTime upgrade_time = 6;
 }
 
+message Objective { string building_name = 1; }
+
+message State { repeated Building buildings = 1; }
+
+// Next ID: 5
 message RunRequest {
   State state = 1;
+  Objective objective = 4;
   int32 rand_seed = 2;
   int32 iteration_report_interval = 3;
 }
 
 message RunResponse {
   message BestStrategy {
-    State state = 1;
-
     enum Action {
       ACTION_UNSET = 0;
       UPGRADE_AMOUNT = 1;
       UPGRADE_TIME = 2;
       END = 3;
     }
-    repeated Action actions = 2;
+    repeated Action actions = 1;
+
+		Building building = 2;
   }
 
   message ProgressInfo {
