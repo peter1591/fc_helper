@@ -49,7 +49,7 @@ export class PresetsComponent {
     );
   }
 
-  ngAfterViewInit() {
+  ngAfterContentInit() {
     // onLoad() internally calls `this.stateService.setState`, which assumes the
     // gamestate component is already initialized, so this initial state will be
     // reflected on UI. Thus this is only called in `ngAfterViewInit`.

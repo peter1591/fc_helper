@@ -1,7 +1,8 @@
-import {Component} from '@angular/core';
+import {Component, ViewChild} from '@angular/core';
 import {FormControl} from '@angular/forms';
+import {MatTabGroup} from '@angular/material/tabs';
 
-import {Building, State} from '../../../build/service.pb'
+import * as pb from '../../../build/service.pb'
 import {StateService} from '../state.service';
 
 export const UNIT_K = 1e3;
@@ -69,7 +70,11 @@ export function parseNumber(s: string|null): number {
   return v * unit;
 }
 
-export function fromNumber(v: number) {
+export function fromNumber(v: number|undefined) {
+  if (v == undefined) {
+    return "";
+  }
+
   let formatNumber = (v: number) => v.toFixed(2);
 
   if (v >= UNIT_cc) {
@@ -90,82 +95,145 @@ export function fromNumber(v: number) {
   return formatNumber(v);
 }
 
+class Building {
+  name = "";
+
+  incomeAmount = new FormControl<string>("");
+  incomeUnit = new FormControl<string>("");
+  incomeInterval = new FormControl<string>("");
+  upgradeAmountCost = new FormControl<string>("");
+  upgradeAmountOneTimeCost = new FormControl<string>("");
+  upgradeAmountMultiplyUpgrades = new FormControl<string>("");
+  upgradeAmountMultiplyMultiply = new FormControl<string>("");
+  upgradeTimeCost = new FormControl<string>("");
+  upgradeTimeIncomeShorten = new FormControl<string>("");
+
+  constructor(name: string) { this.name = name; }
+}
+function makeBuilding(name: string): Building { return new Building(name); }
+
+class City {
+  name = "";
+  buildings: Building[] = [];
+  currentBuildingIndex = 0;
+
+  constructor(name: string, buildings: Building[]) {
+    this.name = name;
+    this.buildings = buildings;
+  }
+}
+
 @Component({
   selector : 'app-gamestate',
   templateUrl : './gamestate.component.html',
   styleUrls : [ './gamestate.component.css' ]
 })
 export class GamestateComponent {
-  incomeAmount = new FormControl<string>("");
-  incomeUnit = new FormControl<string>("");
-  incomeInterval = new FormControl<string>("");
-  upgradeAmount_cost = new FormControl<string>("");
-  upgradeAmount_oneTimeCost = new FormControl<string>("");
-  upgradeAmountMultiplyUpgrades = new FormControl<string>("");
-  upgradeAmountMultiplyMultiply = new FormControl<string>("");
-  upgradeTimeCost = new FormControl<string>("");
-  upgradeTimeIncomeShorten = new FormControl<string>("");
+  cities: City[] = [
+    new City("main",
+             [
+               makeBuilding("main.factory1"),
+               makeBuilding("main.factory2"),
+               makeBuilding("main.factory3"),
+             ]),
+    new City("automn",
+             [
+               makeBuilding("automn.unit1"),
+               makeBuilding("automn.factory2"),
+               makeBuilding("automn.factory3"),
+             ])
+  ];
+  public currentCityIndex = 0;
+  public currentBuildingIndex = 0;
 
   constructor(
       private stateService: StateService,
   ) {
     this.stateService.setStateGetter(this.buildState.bind(this));
-    this.stateService.stateSet$.subscribe(state => this.setState(state))
+    this.stateService.stateSet$.subscribe(state => this.setState(state));
   }
 
-  setState(state: State) {
-    const building = state.buildings![0];
-    this.incomeAmount.setValue(fromNumber(building.income!.amount));
-    this.incomeUnit.setValue(fromNumber(building.income!.unit));
-    this.incomeInterval.setValue(fromNumber(building.income!.interval));
-    this.upgradeAmount_cost.setValue(fromNumber(building.upgradeAmount!.cost));
-    this.upgradeAmount_oneTimeCost.setValue(
-        fromNumber(building.upgradeAmount!.onetimeCost));
-    this.upgradeAmountMultiplyUpgrades.setValue(
-        fromNumber(building.upgradeAmount!.multiply!.upgrades));
-    this.upgradeAmountMultiplyMultiply.setValue(
-        fromNumber(building.upgradeAmount!.multiply!.multiply));
-    this.upgradeTimeCost.setValue(fromNumber(building.upgradeTime!.cost));
-    this.upgradeTimeIncomeShorten.setValue(
-        fromNumber(building.upgradeTime!.incomeShorten));
+  private loadBuilding(building: Building, source: pb.Building) {
+    building.incomeAmount.setValue(fromNumber(source.income?.amount));
+    building.incomeUnit.setValue(fromNumber(source.income?.unit));
+    building.incomeInterval.setValue(fromNumber(source.income?.interval));
+    building.upgradeAmountCost.setValue(fromNumber(source.upgradeAmount?.cost));
+    building.upgradeAmountOneTimeCost.setValue(
+        fromNumber(source.upgradeAmount?.onetimeCost));
+    building.upgradeAmountMultiplyUpgrades.setValue(
+        fromNumber(source.upgradeAmount?.multiply?.upgrades));
+    building.upgradeAmountMultiplyMultiply.setValue(
+        fromNumber(source.upgradeAmount?.multiply?.multiply));
+    building.upgradeTimeCost.setValue(fromNumber(source.upgradeTime?.cost));
+    building.upgradeTimeIncomeShorten.setValue(
+        fromNumber(source.upgradeTime?.incomeShorten));
+  }
+  private buildBuilding(building: Building): pb.Building {
+    var ret = new pb.Building();
+
+    ret.name = building.name;
+    ret.currentAmount = 0;
+    ret.targetAmount = 0;
+    ret.elapsedTime = 0;
+
+    ret.income = new pb.Building.Income();
+    ret.income.amount = parseNumber(building.incomeAmount.value);
+    ret.income.unit = parseNumber(building.incomeUnit.value);
+    ret.income.interval = parseNumber(building.incomeInterval.value);
+    ret.income.otherIncomePerSec = 0;
+
+    ret.upgradeAmount = new pb.Building.UpgradeAmount();
+    ret.upgradeAmount.cost = parseNumber(building.upgradeAmountCost.value);
+    ret.upgradeAmount.nextCostMultipler = 1.08;
+    ret.upgradeAmount.onetimeCost =
+        parseNumber(building.upgradeAmountOneTimeCost.value);
+    ret.upgradeAmount.multiply = new pb.Building.UpgradeAmount.MultiplyAmount();
+    ret.upgradeAmount.multiply.upgrades =
+        parseNumber(building.upgradeAmountMultiplyUpgrades.value);
+    ret.upgradeAmount.multiply.multiply =
+        parseNumber(building.upgradeAmountMultiplyMultiply.value);
+    ret.upgradeAmount.availables = ret.upgradeAmount.multiply.upgrades + 1;
+
+    ret.upgradeTime = new pb.Building.UpgradeTime();
+    ret.upgradeTime.cost = parseNumber(building.upgradeTimeCost.value);
+    ret.upgradeTime.incomeShorten =
+        parseNumber(building.upgradeTimeIncomeShorten.value);
+    ret.upgradeTime.nextCostMultipler = 1.08;
+    ret.upgradeTime.availables = 10;
+
+    return ret;
+  }
+
+  private getPbBuilding(state: pb.State, buildingName: string): pb.Building {
+    var found: pb.Building|undefined;
+    if (state.buildings != undefined) {
+      state.buildings.forEach(pbBuilding => {
+        if (pbBuilding.name == buildingName) {
+          found = pbBuilding;
+        }
+      })
+    }
+    return found || new pb.Building();
+  }
+
+  setState(state: pb.State) {
+    this.cities.forEach(
+        city => {city.buildings.forEach(building => {
+          this.loadBuilding(building, this.getPbBuilding(state, building.name));
+        })});
   }
 
   buildState() {
-    var building = new Building();
-    building.currentAmount = 0;
-
-    building.targetAmount = 0;
-    building.elapsedTime = 0;
-
-    building.income = new Building.Income();
-    building.income.amount = parseNumber(this.incomeAmount.value);
-    building.income.unit = parseNumber(this.incomeUnit.value);
-    building.income.interval = parseNumber(this.incomeInterval.value);
-    building.income.otherIncomePerSec = 0;
-
-    building.upgradeAmount = new Building.UpgradeAmount();
-    building.upgradeAmount.cost = parseNumber(this.upgradeAmount_cost.value);
-    building.upgradeAmount.nextCostMultipler = 1.08;
-    building.upgradeAmount.onetimeCost =
-        parseNumber(this.upgradeAmount_oneTimeCost.value);
-    building.upgradeAmount.multiply =
-        new Building.UpgradeAmount.MultiplyAmount();
-    building.upgradeAmount.multiply.upgrades =
-        parseNumber(this.upgradeAmountMultiplyUpgrades.value);
-    building.upgradeAmount.multiply.multiply =
-        parseNumber(this.upgradeAmountMultiplyMultiply.value);
-    building.upgradeAmount.availables =
-        building.upgradeAmount.multiply.upgrades + 1;
-
-    building.upgradeTime = new Building.UpgradeTime();
-    building.upgradeTime.cost = parseNumber(this.upgradeTimeCost.value);
-    building.upgradeTime.incomeShorten =
-        parseNumber(this.upgradeTimeIncomeShorten.value);
-    building.upgradeTime.nextCostMultipler = 1.08;
-    building.upgradeTime.availables = 10;
-
-    var state = new State();
-    state.buildings = [ building ];
+    var state = new pb.State();
+    state.buildings = [];
+    this.cities.forEach(city => {city.buildings.forEach(building => {
+                          state.buildings!.push(this.buildBuilding(building));
+                        })});
     return state;
+  }
+
+  getBuildingName() {
+		const city = this.cities[this.currentCityIndex];
+		return city.buildings[city.currentBuildingIndex].name;
   }
 }

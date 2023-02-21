@@ -2,9 +2,10 @@ import {Component, ViewChild} from '@angular/core';
 import {FormControl} from '@angular/forms';
 import {GrpcStatusEvent} from '@ngx-grpc/common';
 
-import {RunRequest, RunResponse, State} from '../../build/service.pb'
+import * as pb from '../../build/service.pb'
 import {AIServiceClient} from '../../build/service.pbsc';
 
+import {GamestateComponent} from './gamestate/gamestate.component';
 import {StateService} from './state.service';
 
 @Component({
@@ -13,10 +14,10 @@ import {StateService} from './state.service';
   styleUrls : [ './app.component.css' ]
 })
 export class AppComponent {
-  title = 'web';
-
   msgs: string[] = [];
-  bestActions: RunResponse.BestStrategy.Action[] = [];
+  bestActions: pb.RunResponse.BestStrategy.Action[] = [];
+
+	@ViewChild(GamestateComponent) gamestate! : GamestateComponent;
 
   constructor(
       private client: AIServiceClient,
@@ -24,8 +25,10 @@ export class AppComponent {
   ) {}
 
   sendRequest() {
-    const request = new RunRequest();
+    const request = new pb.RunRequest();
     request.state = this.stateService.getState();
+		request.objective = new pb.Objective(); 
+		request.objective.buildingName = this.gamestate.getBuildingName();
     request.randSeed = 42;
     request.iterationReportInterval = 1000000;
 
@@ -37,12 +40,12 @@ export class AppComponent {
         () => { this.postMessage('rpc completed'); })
   }
 
-  private processResponse(response: RunResponse) {
+  private processResponse(response: pb.RunResponse) {
     this.postMessage('got response: ' + JSON.stringify(response.toJSON()));
 
     if (response.bestStrategy) {
       this.bestActions = response.bestStrategy.actions ??
-                         [ RunResponse.BestStrategy.Action.ACTION_UNSET ];
+                         [ pb.RunResponse.BestStrategy.Action.ACTION_UNSET ];
     }
   }
 
