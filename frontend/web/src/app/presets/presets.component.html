@@ -8,8 +8,8 @@
     matInput
   />
   <mat-autocomplete #auto="matAutocomplete">
-    <mat-option *ngFor="let option of options" [value]="option">
-      {{ option }}
+    <mat-option *ngFor="let s of saveNames" [value]="s">
+      {{ s }}
     </mat-option>
   </mat-autocomplete>
 </mat-form-field>

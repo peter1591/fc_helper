@@ -11,6 +11,8 @@
 using namespace grpc;
 
 using wiring::AIService;
+using wiring::ListRequest;
+using wiring::ListResponse;
 using wiring::LoadRequest;
 using wiring::LoadResponse;
 using wiring::RunRequest;
@@ -63,24 +65,32 @@ private:
 
   Status save(ServerContext *, const SaveRequest *request,
               SaveResponse *) override {
-		addToDatabase(*request);
-		saveDatabase();
+    addToDatabase(*request);
+    saveDatabase();
     return Status::OK;
   }
 
-	void addToDatabase(const SaveRequest& request) {
+  Status list(ServerContext *, const ListRequest *,
+              ListResponse *response) override {
+    for (const auto &entry : database.saved_requests()) {
+      *response->add_name() = entry.name();
+    }
+    return Status::OK;
+  }
+
+  void addToDatabase(const SaveRequest &request) {
     for (auto &entry : *database.mutable_saved_requests()) {
       if (request.name() != entry.name()) {
         continue;
       }
       *entry.mutable_request() = request.request();
-			return;
+      return;
     }
 
     auto *entry = database.mutable_saved_requests()->Add();
     entry->set_name(request.name());
     *entry->mutable_request() = request.request();
-	}
+  }
 
   wiring::Database database;
 };

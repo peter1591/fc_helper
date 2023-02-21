@@ -3,6 +3,8 @@ import {FormControl} from '@angular/forms';
 
 import {
   Building,
+  ListRequest,
+  ListResponse,
   LoadRequest,
   RunRequest,
   SaveRequest,
@@ -29,39 +31,28 @@ export class PresetsComponent {
   constructor(
       private client: AIServiceClient,
       private stateService: StateService,
-  ) {}
+  ) {
+    this.loadSaveNames();
+  }
 
+  saveNames: string[] = [];
   saveName = new FormControl<string>("default");
   msg = "";
 
-	options = ['asd', 'sdf', 'dfg'];
+  private loadSaveNames() {
+    var request = new ListRequest();
+    this.client.list(request).subscribe(
+        response => this.saveNames = response.name,
+        error => this.msg = "failed to list: " + error,
+        () => {},
+    );
+  }
 
   ngAfterViewInit() {
-    var building = new Building();
-    building.income = new Building.Income();
-    building.income.amount = 6194;
-		building.income.unit = 511.12 * UNIT_bb / 7250;
-    building.income.interval = 27.3;
-
-    building.upgradeAmount = new Building.UpgradeAmount();
-    building.upgradeAmount.cost = 7.66 * UNIT_cc;
-    building.upgradeAmount.onetimeCost = 0;
-    building.upgradeAmount.multiply =
-        new Building.UpgradeAmount.MultiplyAmount();
-    building.upgradeAmount.multiply.upgrades = 9;
-    building.upgradeAmount.multiply.multiply = 1.2;
-
-    building.upgradeTime = new Building.UpgradeTime();
-    building.upgradeTime.cost = 8.3 * UNIT_cc;
-    building.upgradeTime.incomeShorten = 0.6;
-
-    var state = new State();
-    state.buildings = [ building ];
-
-    // This assumes the gamestate component is already initialized, so this
-    // initial state will be reflected on UI. Thus this is only called in
-    // `ngAfterViewInit`.
-    this.stateService.setState(state);
+    // onLoad() internally calls `this.stateService.setState`, which assumes the
+    // gamestate component is already initialized, so this initial state will be
+    // reflected on UI. Thus this is only called in `ngAfterViewInit`.
+    this.onLoad();
   }
 
   onSave() {
