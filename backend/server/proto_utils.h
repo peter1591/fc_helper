@@ -9,7 +9,7 @@ void toProtoStateIncome(const State::Income &in, wiring::Building::Income &out) 
 }
 
 void fromProtoStateIncome(const wiring::Building::Income &in, State::Income &out) {
-  out.amount = in.amount();
+  out.amount = in.amount() * in.unit();
   out.interval = in.interval();
   out.other_income_per_sec = in.other_income_per_sec();
 }
@@ -62,7 +62,7 @@ void fromProtoStateUpgradeTime(const wiring::Building::UpgradeTime &in,
   out.availables = in.availables();
 }
 
-void toProtoState(const State &in, wiring::Building &out) {
+void toProtoBuilding(const State &in, wiring::Building &out) {
   out.set_current_amount(in.current_amount);
   out.set_target_amount(in.target_amount);
   out.set_elapsed_time(in.elapsed_time);
@@ -72,7 +72,7 @@ void toProtoState(const State &in, wiring::Building &out) {
   toProtoStateUpgradeTime(in.upgrade_time, *out.mutable_upgrade_time());
 }
 
-void fromProtoState(const wiring::Building &in, State &out) {
+void fromProtoBuilding(const wiring::Building &in, State &out) {
   out.current_amount = in.current_amount();
   out.target_amount = in.target_amount();
   out.elapsed_time = in.elapsed_time();
@@ -94,7 +94,7 @@ AIRequest toAiRequest(const wiring::RunRequest &in) {
 			throw std::runtime_error("more than two buildings with the same name");
 		}
 
-		fromProtoState(building, out.state);
+		fromProtoBuilding(building, out.state);
 		found = true;
 	}
 	if (!found) {
@@ -126,7 +126,7 @@ wiring::RunResponse fromAiResult(const AIResult &in) {
       for (const Action action : in.actions) {
         out.mutable_actions()->Add(toProtoAction(action));
       }
-			toProtoState(in.state, *out.mutable_building());
+			toProtoBuilding(in.state, *out.mutable_building());
     }(std::get<BestStrategy>(in), *out.mutable_best_strategy());
   } else if (std::holds_alternative<AIProgressInfo>(in)) {
     [](const AIProgressInfo &in, wiring::RunResponse::ProgressInfo &out) {

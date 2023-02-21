@@ -1,1 +1,6 @@
-<p>presets works!</p>
+<p>
+  Save name <input type="text" [formControl]="saveName" />
+  <button (click)="onSave()">Save</button>
+  <button (click)="onLoad()">Load</button>
+	{{ msg }}
+</p>

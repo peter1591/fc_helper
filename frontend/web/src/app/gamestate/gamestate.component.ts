@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 import {FormControl} from '@angular/forms';
 
-import {State, Building} from '../../../build/service.pb'
+import {Building, State} from '../../../build/service.pb'
 import {StateService} from '../state.service';
 
 export const UNIT_K = 1e3;
@@ -96,8 +96,8 @@ export function fromNumber(v: number) {
   styleUrls : [ './gamestate.component.css' ]
 })
 export class GamestateComponent {
-  unitPrice = new FormControl<string>("");
-  incomeUnits = new FormControl<string>("");
+  incomeAmount = new FormControl<string>("");
+  incomeUnit = new FormControl<string>("");
   incomeInterval = new FormControl<string>("");
   upgradeAmount_cost = new FormControl<string>("");
   upgradeAmount_oneTimeCost = new FormControl<string>("");
@@ -114,10 +114,9 @@ export class GamestateComponent {
   }
 
   setState(state: State) {
-		const building = state.buildings![0];
-    this.unitPrice.setValue(fromNumber(this.stateService.UNIT_PRICE));
-    this.incomeUnits.setValue(
-        fromNumber(building.income!.amount / this.stateService.UNIT_PRICE));
+    const building = state.buildings![0];
+    this.incomeAmount.setValue(fromNumber(building.income!.amount));
+    this.incomeUnit.setValue(fromNumber(building.income!.unit));
     this.incomeInterval.setValue(fromNumber(building.income!.interval));
     this.upgradeAmount_cost.setValue(fromNumber(building.upgradeAmount!.cost));
     this.upgradeAmount_oneTimeCost.setValue(
@@ -132,16 +131,15 @@ export class GamestateComponent {
   }
 
   buildState() {
-		var building = new Building();
+    var building = new Building();
     building.currentAmount = 0;
 
     building.targetAmount = 0;
     building.elapsedTime = 0;
 
-    const UNIT_PRICE = parseNumber(this.unitPrice.value);
-
     building.income = new Building.Income();
-    building.income.amount = parseNumber(this.incomeUnits.value) * UNIT_PRICE;
+    building.income.amount = parseNumber(this.incomeAmount.value);
+    building.income.unit = parseNumber(this.incomeUnit.value);
     building.income.interval = parseNumber(this.incomeInterval.value);
     building.income.otherIncomePerSec = 0;
 
@@ -150,12 +148,14 @@ export class GamestateComponent {
     building.upgradeAmount.nextCostMultipler = 1.08;
     building.upgradeAmount.onetimeCost =
         parseNumber(this.upgradeAmount_oneTimeCost.value);
-    building.upgradeAmount.multiply = new Building.UpgradeAmount.MultiplyAmount();
+    building.upgradeAmount.multiply =
+        new Building.UpgradeAmount.MultiplyAmount();
     building.upgradeAmount.multiply.upgrades =
         parseNumber(this.upgradeAmountMultiplyUpgrades.value);
     building.upgradeAmount.multiply.multiply =
         parseNumber(this.upgradeAmountMultiplyMultiply.value);
-    building.upgradeAmount.availables = building.upgradeAmount.multiply.upgrades + 1;
+    building.upgradeAmount.availables =
+        building.upgradeAmount.multiply.upgrades + 1;
 
     building.upgradeTime = new Building.UpgradeTime();
     building.upgradeTime.cost = parseNumber(this.upgradeTimeCost.value);
@@ -165,7 +165,7 @@ export class GamestateComponent {
     building.upgradeTime.availables = 10;
 
     var state = new State();
-		state.buildings = [building];
+    state.buildings = [ building ];
     return state;
   }
 }

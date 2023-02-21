@@ -16,6 +16,4 @@ export class StateService {
   stateSet$ = this.stateSet.asObservable();
 
   setState(state: State) { this.stateSet.next(state); }
-
-  UNIT_PRICE = 0;
 }
