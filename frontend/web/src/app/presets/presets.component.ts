@@ -6,6 +6,7 @@ import {
   ListRequest,
   ListResponse,
   LoadRequest,
+  RemoveRequest,
   RunRequest,
   SaveRequest,
   State
@@ -85,6 +86,24 @@ export class PresetsComponent {
         },
         error => this.msg = "failed to load: " + error,
         () => {},
+    );
+  }
+
+  onRemove() {
+    var request = new RemoveRequest();
+    request.name = this.saveName.value ?? "";
+
+    this.msg = "removing";
+    this.client.remove(request).subscribe(
+        response => this.msg = "removed",
+        error => this.msg = "failed to remove: " + error,
+        () => {
+          this.loadSaveNames();
+          if (this.saveNames.length > 0) {
+            this.saveName.setValue(this.saveNames[0]);
+            this.onLoad();
+          }
+        },
     );
   }
 }

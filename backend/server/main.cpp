@@ -9,16 +9,7 @@
 #include "proto_utils.h"
 
 using namespace grpc;
-
-using wiring::AIService;
-using wiring::ListRequest;
-using wiring::ListResponse;
-using wiring::LoadRequest;
-using wiring::LoadResponse;
-using wiring::RunRequest;
-using wiring::RunResponse;
-using wiring::SaveRequest;
-using wiring::SaveResponse;
+using namespace wiring;
 
 class ServiceImpl : public AIService::Service {
   static constexpr char kDatabasePath[] = "/home/shenen/fchelper.state";
@@ -78,6 +69,13 @@ private:
     return Status::OK;
   }
 
+  Status remove(ServerContext *, const RemoveRequest *request,
+                RemoveResponse *) override {
+    removeFromDatabase(*request);
+    saveDatabase();
+		return Status::OK;
+  }
+
   void addToDatabase(const SaveRequest &request) {
     for (auto &entry : *database.mutable_saved_requests()) {
       if (request.name() != entry.name()) {
@@ -90,6 +88,19 @@ private:
     auto *entry = database.mutable_saved_requests()->Add();
     entry->set_name(request.name());
     *entry->mutable_request() = request.request();
+  }
+
+  void removeFromDatabase(const RemoveRequest &request) {
+    int idx = -1;
+    for (int i = 0; i < database.saved_requests().size(); ++i) {
+      if (database.saved_requests(i).name() == request.name()) {
+        idx = i;
+        break;
+      }
+    }
+    if (idx >= 0) {
+      database.mutable_saved_requests()->DeleteSubrange(idx, 1);
+    }
   }
 
   wiring::Database database;
