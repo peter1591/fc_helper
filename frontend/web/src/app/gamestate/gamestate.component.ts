@@ -3,7 +3,7 @@ import {FormControl} from '@angular/forms';
 import {MatTabGroup} from '@angular/material/tabs';
 
 import * as pb from '../../../build/service.pb'
-import {StateService} from '../state.service';
+import {StorageService} from '../storage.service';
 
 export const UNIT_K = 1e3;
 export const UNIT_M = 1e6;
@@ -111,8 +111,8 @@ class Building {
 }
 function makeBuilding(cityName: string, buildingName: string): Building {
   var o = new Building();
-	o.name = cityName + "." + buildingName;
-	return o;
+  o.name = cityName + "." + buildingName;
+  return o;
 }
 
 class City {
@@ -135,29 +135,33 @@ export class GamestateComponent {
   cities: City[] = [
     new City("main",
              [
-               makeBuilding("main","factory1"),
-               makeBuilding("main","factory2"),
-               makeBuilding("main","factory3"),
+               makeBuilding("main", "factory1"),
+               makeBuilding("main", "factory2"),
+               makeBuilding("main", "factory3"),
              ]),
     new City("automn",
              [
-               makeBuilding("automn","unit1"),
-               makeBuilding("automn","unit2"),
-               makeBuilding("automn","unit3"),
-               makeBuilding("automn","unit4"),
-               makeBuilding("automn","unit5"),
-               makeBuilding("automn","unit6"),
-               makeBuilding("automn","unit7"),
+               makeBuilding("automn", "unit1"),
+               makeBuilding("automn", "unit2"),
+               makeBuilding("automn", "unit3"),
+               makeBuilding("automn", "unit4"),
+               makeBuilding("automn", "unit5"),
+               makeBuilding("automn", "unit6"),
+               makeBuilding("automn", "unit7"),
              ])
   ];
   public currentCityIndex = 0;
   public currentBuildingIndex = 0;
 
   constructor(
-      private stateService: StateService,
+      private storageService: StorageService,
   ) {
-    this.stateService.setStateGetter(this.buildState.bind(this));
-    this.stateService.stateSet$.subscribe(state => this.setState(state));
+    this.storageService.registerFiller((v: pb.LoadResponse) => {
+      v.request ??= new pb.RunRequest();
+      v.request.state = this.buildState()
+    });
+    this.storageService.setSubject$.subscribe(
+        o => this.setState(o.request!.state!));
   }
 
   private loadBuilding(building: Building, source: pb.Building) {

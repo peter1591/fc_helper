@@ -21,7 +21,7 @@ import {
   UNIT_M,
   UNIT_T,
 } from '../gamestate/gamestate.component';
-import {StateService} from '../state.service';
+import {StorageService} from '../storage.service';
 
 @Component({
   selector : 'app-presets',
@@ -31,7 +31,7 @@ import {StateService} from '../state.service';
 export class PresetsComponent {
   constructor(
       private client: AIServiceClient,
-      private stateService: StateService,
+      private storageService: StorageService,
   ) {
     this.loadSaveNames();
   }
@@ -50,7 +50,7 @@ export class PresetsComponent {
   }
 
   ngAfterContentInit() {
-    // onLoad() internally calls `this.stateService.setState`, which assumes the
+    // onLoad() internally calls `this.storageService.setState`, which assumes the
     // gamestate component is already initialized, so this initial state will be
     // reflected on UI. Thus this is only called in `ngAfterViewInit`.
     this.onLoad();
@@ -59,8 +59,7 @@ export class PresetsComponent {
   onSave() {
     var request = new SaveRequest();
     request.name = this.saveName.value ?? "";
-    request.request = new RunRequest();
-    request.request.state = this.stateService.getState();
+    request.request = this.storageService.get().request;
 
     this.msg = "saving";
     this.client.save(request).subscribe(
@@ -80,7 +79,7 @@ export class PresetsComponent {
           if (response.request?.state === undefined) {
             this.msg = "failed to load: got empty response"
           } else {
-            this.stateService.setState(response.request!.state!);
+            this.storageService.set(response);
             this.msg = "loaded";
           }
         },

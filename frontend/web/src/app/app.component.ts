@@ -9,7 +9,7 @@ import {
   GamestateComponent,
   parseNumber,
 } from './gamestate/gamestate.component';
-import {StateService} from './state.service';
+import {StorageService} from './storage.service';
 
 @Component({
   selector : 'app-root',
@@ -26,12 +26,12 @@ export class AppComponent {
 
   constructor(
       private client: AIServiceClient,
-      private stateService: StateService,
+      private storageService: StorageService,
   ) {}
 
   sendRequest() {
     const request = new pb.RunRequest();
-    request.state = this.stateService.getState();
+    request.state = this.storageService.get().request!.state;
     request.objective = new pb.Objective();
     request.objective.buildingName = this.gamestate.getSelectedBuildingName();
     request.objective.targetAmount = parseNumber(this.targetAmount.value);
