@@ -5,11 +5,7 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import * as pb from '../../build/service.pb'
 import {AIServiceClient} from '../../build/service.pbsc';
 
-import {
-  fromNumber,
-  GamestateComponent,
-  parseNumber,
-} from './gamestate/gamestate.component';
+import {fromNumber, parseNumber} from './gamestate/gamestate.component';
 import {StorageService} from './storage.service';
 
 @Component({
@@ -21,8 +17,6 @@ export class AppComponent {
   msgs: string[] = [];
   bestActions: pb.RunResponse.BestStrategy.Action[] = [];
 
-  @ViewChild(GamestateComponent) gamestate!: GamestateComponent;
-
   targetAmount = new FormControl<string>("");
 
   constructor(
@@ -32,11 +26,9 @@ export class AppComponent {
     this.storageService.registerFiller((v: pb.LoadResponse) => {
       v.request!.objective ??= new pb.Objective();
       var o = v.request!.objective;
-      o.buildingName = this.gamestate.getSelectedBuildingName();
       o.targetAmount = parseNumber(this.targetAmount.value);
     });
     this.storageService.setSubject$.subscribe(
-        // TODO: move buildingName to gamestate component
         o => this.targetAmount.setValue(
             fromNumber(o.request?.objective?.targetAmount)));
   }

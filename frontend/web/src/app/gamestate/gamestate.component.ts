@@ -157,10 +157,15 @@ export class GamestateComponent {
       private storageService: StorageService,
   ) {
     this.storageService.registerFiller((v: pb.LoadResponse) => {
-      v.request!.state = this.buildState()
+      v.request!.state = this.buildState();
+
+      v.request!.objective ??= new pb.Objective();
+      v.request!.objective.buildingName = this.getSelectedBuildingName();
     });
-    this.storageService.setSubject$.subscribe(
-        o => this.setState(o.request!.state!));
+    this.storageService.setSubject$.subscribe(o => {
+      this.setState(o.request!.state!);
+      this.selectBuilding(o.request!.objective!.buildingName);
+    });
   }
 
   private loadBuilding(building: Building, source: pb.Building) {
@@ -249,4 +254,16 @@ export class GamestateComponent {
     const city = this.cities[this.currentCityIndex];
     return city.buildings[city.currentBuildingIndex].name;
   }
+
+	selectBuilding(buildingName : string) {
+		console.log("trying to select to building: " + buildingName);
+		this.cities.forEach((city, cityIndex) => 
+			city.buildings.forEach((building, buildingIndex) => {
+				if (building.name == buildingName) {
+					this.currentCityIndex = cityIndex;
+					city.currentBuildingIndex = buildingIndex;
+				}
+			})
+		);
+	}
 }
