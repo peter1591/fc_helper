@@ -37,10 +37,10 @@ public:
 
   void run(const AIRequest &request, Callback callback) {
     //assert(request.state.target_amount > 0);
-    //ObjectiveFirstReachTarget objective;
+    ObjectiveFirstReachTarget objective;
 
-    assert(request.state.target_amount == 0);
-    ObjectiveFirstFinishAllUpgrades objective;
+    //assert(request.state.target_amount == 0);
+    //ObjectiveFirstFinishAllUpgrades objective;
 
     HitCountSlidingWindow<HIT_COUNT_WINDOW_SIZE> new_node_count;
 

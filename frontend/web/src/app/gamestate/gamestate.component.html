@@ -36,6 +36,15 @@
         </mat-form-field>
 
         <mat-form-field>
+          <mat-label>income amount+</mat-label>
+          <input
+            matInput
+            type="text"
+            [formControl]="building.upgradeAmountIncomeIncrease"
+          />
+        </mat-form-field>
+
+        <mat-form-field>
           <mat-label>oneTimeCost</mat-label>
           <input
             matInput
@@ -63,7 +72,7 @@
         </mat-form-field>
 
         <mat-divider></mat-divider>
-        <h4>Upgrade Time></h4>
+        <h4>Upgrade Time</h4>
         <mat-form-field>
           <mat-label>cost</mat-label>
           <input

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <climits>
+#include <limits>
 #include <vector>
 
 #include "action.h"
@@ -22,9 +23,11 @@ void printBestStrategy(const BestStrategy &v) {
 }
 
 struct ObjectiveBase {
-	ObjectiveBase() { best.state.elapsed_time = INT_MAX; }
+  ObjectiveBase() {
+    best.state.elapsed_time = std::numeric_limits<double>::infinity();
+  }
 
-	BestStrategy best;
+  BestStrategy best;
 };
 
 struct ObjectiveFirstReachTarget : ObjectiveBase {
@@ -38,9 +41,9 @@ struct ObjectiveFirstReachTarget : ObjectiveBase {
       return false;
     }
 
-		best.actions = history;
-		best.state = state;
-		return true;
+    best.actions = history;
+    best.state = state;
+    return true;
   }
 };
 
@@ -57,8 +60,8 @@ struct ObjectiveFirstFinishAllUpgrades : ObjectiveBase {
       return false;
     }
 
-		best.state = state;
-		best.actions = history;
+    best.state = state;
+    best.actions = history;
     return true;
   }
 };

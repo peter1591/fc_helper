@@ -102,15 +102,18 @@ class Building {
   incomeUnit = new FormControl<string>("");
   incomeInterval = new FormControl<string>("");
   upgradeAmountCost = new FormControl<string>("");
+  upgradeAmountIncomeIncrease = new FormControl<string>("");
   upgradeAmountOneTimeCost = new FormControl<string>("");
   upgradeAmountMultiplyUpgrades = new FormControl<string>("");
   upgradeAmountMultiplyMultiply = new FormControl<string>("");
   upgradeTimeCost = new FormControl<string>("");
   upgradeTimeIncomeShorten = new FormControl<string>("");
-
-  constructor(name: string) { this.name = name; }
 }
-function makeBuilding(name: string): Building { return new Building(name); }
+function makeBuilding(cityName: string, buildingName: string): Building {
+  var o = new Building();
+	o.name = cityName + "." + buildingName;
+	return o;
+}
 
 class City {
   name = "";
@@ -132,15 +135,19 @@ export class GamestateComponent {
   cities: City[] = [
     new City("main",
              [
-               makeBuilding("main.factory1"),
-               makeBuilding("main.factory2"),
-               makeBuilding("main.factory3"),
+               makeBuilding("main","factory1"),
+               makeBuilding("main","factory2"),
+               makeBuilding("main","factory3"),
              ]),
     new City("automn",
              [
-               makeBuilding("automn.unit1"),
-               makeBuilding("automn.factory2"),
-               makeBuilding("automn.factory3"),
+               makeBuilding("automn","unit1"),
+               makeBuilding("automn","unit2"),
+               makeBuilding("automn","unit3"),
+               makeBuilding("automn","unit4"),
+               makeBuilding("automn","unit5"),
+               makeBuilding("automn","unit6"),
+               makeBuilding("automn","unit7"),
              ])
   ];
   public currentCityIndex = 0;
@@ -158,6 +165,8 @@ export class GamestateComponent {
     building.incomeUnit.setValue(fromNumber(source.income?.unit));
     building.incomeInterval.setValue(fromNumber(source.income?.interval));
     building.upgradeAmountCost.setValue(fromNumber(source.upgradeAmount?.cost));
+    building.upgradeAmountIncomeIncrease.setValue(
+        fromNumber(source.upgradeAmount?.incomeIncrease));
     building.upgradeAmountOneTimeCost.setValue(
         fromNumber(source.upgradeAmount?.onetimeCost));
     building.upgradeAmountMultiplyUpgrades.setValue(
@@ -173,7 +182,6 @@ export class GamestateComponent {
 
     ret.name = building.name;
     ret.currentAmount = 0;
-    ret.targetAmount = 0;
     ret.elapsedTime = 0;
 
     ret.income = new pb.Building.Income();
@@ -184,6 +192,8 @@ export class GamestateComponent {
 
     ret.upgradeAmount = new pb.Building.UpgradeAmount();
     ret.upgradeAmount.cost = parseNumber(building.upgradeAmountCost.value);
+    ret.upgradeAmount.incomeIncrease =
+        parseNumber(building.upgradeAmountIncomeIncrease.value);
     ret.upgradeAmount.nextCostMultipler = 1.08;
     ret.upgradeAmount.onetimeCost =
         parseNumber(building.upgradeAmountOneTimeCost.value);
@@ -232,8 +242,8 @@ export class GamestateComponent {
     return state;
   }
 
-  getBuildingName() {
-		const city = this.cities[this.currentCityIndex];
-		return city.buildings[city.currentBuildingIndex].name;
+  getSelectedBuildingName() {
+    const city = this.cities[this.currentCityIndex];
+    return city.buildings[city.currentBuildingIndex].name;
   }
 }

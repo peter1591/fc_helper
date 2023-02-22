@@ -64,7 +64,6 @@ void fromProtoStateUpgradeTime(const wiring::Building::UpgradeTime &in,
 
 void toProtoBuilding(const State &in, wiring::Building &out) {
   out.set_current_amount(in.current_amount);
-  out.set_target_amount(in.target_amount);
   out.set_elapsed_time(in.elapsed_time);
 
   toProtoStateIncome(in.income, *out.mutable_income());
@@ -74,7 +73,6 @@ void toProtoBuilding(const State &in, wiring::Building &out) {
 
 void fromProtoBuilding(const wiring::Building &in, State &out) {
   out.current_amount = in.current_amount();
-  out.target_amount = in.target_amount();
   out.elapsed_time = in.elapsed_time();
 
   fromProtoStateIncome(in.income(), out.income);
@@ -108,11 +106,17 @@ AIRequest toAiRequest(const wiring::RunRequest &in) {
 			throw std::runtime_error("building in the objective is not found");
 		}
 		fromProtoBuilding(*targetBuilding, out.state);
+
+		out.state.target_amount = in.objective().target_amount();
+
 		found = true;
 	}
 	if (!found) {
 		throw std::runtime_error("couldn't find building with objective name");
 	}
+
+	std::cout << "sending state to AI" << std::endl;
+	printState(out.state);
 
   out.rand_seed = in.rand_seed();
   out.iteration_report_interval = in.iteration_report_interval();

@@ -5,7 +5,10 @@ import {GrpcStatusEvent} from '@ngx-grpc/common';
 import * as pb from '../../build/service.pb'
 import {AIServiceClient} from '../../build/service.pbsc';
 
-import {GamestateComponent} from './gamestate/gamestate.component';
+import {
+  GamestateComponent,
+  parseNumber,
+} from './gamestate/gamestate.component';
 import {StateService} from './state.service';
 
 @Component({
@@ -17,7 +20,9 @@ export class AppComponent {
   msgs: string[] = [];
   bestActions: pb.RunResponse.BestStrategy.Action[] = [];
 
-	@ViewChild(GamestateComponent) gamestate! : GamestateComponent;
+  @ViewChild(GamestateComponent) gamestate!: GamestateComponent;
+
+  targetAmount = new FormControl<string>("");
 
   constructor(
       private client: AIServiceClient,
@@ -27,12 +32,15 @@ export class AppComponent {
   sendRequest() {
     const request = new pb.RunRequest();
     request.state = this.stateService.getState();
-		request.objective = new pb.Objective(); 
-		request.objective.buildingName = this.gamestate.getBuildingName();
+    request.objective = new pb.Objective();
+    request.objective.buildingName = this.gamestate.getSelectedBuildingName();
+    request.objective.targetAmount = parseNumber(this.targetAmount.value);
     request.randSeed = 42;
     request.iterationReportInterval = 1000000;
 
     this.postMessage('sending request: ' + JSON.stringify(request.toJSON()));
+
+    this.bestActions = [];
 
     this.client.run(request).subscribe(
         response => this.processResponse(response),

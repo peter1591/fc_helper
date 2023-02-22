@@ -1,27 +1,27 @@
-<mat-tab-group main>
-  <mat-tab gamestate label="State">
-    <app-gamestate></app-gamestate>
+<app-presets></app-presets>
+<app-gamestate></app-gamestate>
 
-    <h4>Optimize</h4>
-    <button type="button" (click)="sendRequest()">
-      Start
-    </button>
+<h4>Optimize</h4>
+<mat-form-field>
+  <mat-label>target amount</mat-label>
+  <input
+    matInput
+    type="text"
+    [formControl]="targetAmount"
+  />
+</mat-form-field>
+<button type="button" (click)="sendRequest()">
+  Start
+</button>
 
-    <h4>Result</h4>
-    <div>
-      Best actions:
-      <ng-container *ngFor="let action of bestActions">
-        {{ action }},
-      </ng-container>
-    </div>
+<h4>Result</h4>
+<div>
+  Best actions:
+  <ng-container *ngFor="let action of bestActions">
+    {{ action }},
+  </ng-container>
+</div>
 
-    <div *ngFor="let msg of msgs.slice().reverse()">
-      <li>{{ msg }}</li>
-    </div>
-  </mat-tab>
-  <mat-tab presets label="Presets">
-    <app-presets></app-presets>
-  </mat-tab>
-</mat-tab-group>
-
-<mat-divider></mat-divider>
+<div *ngFor="let msg of msgs.slice().reverse()">
+  <li>{{ msg }}</li>
+</div>
