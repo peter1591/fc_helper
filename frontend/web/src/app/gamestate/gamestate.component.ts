@@ -148,6 +148,8 @@ export class GamestateComponent {
                makeBuilding("automn", "unit5"),
                makeBuilding("automn", "unit6"),
                makeBuilding("automn", "unit7"),
+               makeBuilding("automn", "unit8"),
+               makeBuilding("automn", "unit9"),
              ])
   ];
   public currentCityIndex = 0;
