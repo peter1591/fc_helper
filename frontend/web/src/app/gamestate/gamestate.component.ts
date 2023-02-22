@@ -157,8 +157,7 @@ export class GamestateComponent {
       private storageService: StorageService,
   ) {
     this.storageService.registerFiller((v: pb.LoadResponse) => {
-      v.request ??= new pb.RunRequest();
-      v.request.state = this.buildState()
+      v.request!.state = this.buildState()
     });
     this.storageService.setSubject$.subscribe(
         o => this.setState(o.request!.state!));

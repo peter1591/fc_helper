@@ -19,6 +19,7 @@ export class StorageService {
 
   get(): pb.LoadResponse {
     var o = new pb.LoadResponse();
+    o.request = new pb.RunRequest();
     this.fillers.forEach(fn => fn(o));
     return o;
   }

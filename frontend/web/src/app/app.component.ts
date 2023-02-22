@@ -6,6 +6,7 @@ import * as pb from '../../build/service.pb'
 import {AIServiceClient} from '../../build/service.pbsc';
 
 import {
+  fromNumber,
   GamestateComponent,
   parseNumber,
 } from './gamestate/gamestate.component';
@@ -27,14 +28,21 @@ export class AppComponent {
   constructor(
       private client: AIServiceClient,
       private storageService: StorageService,
-  ) {}
+  ) {
+    this.storageService.registerFiller((v: pb.LoadResponse) => {
+      v.request!.objective ??= new pb.Objective();
+      var o = v.request!.objective;
+      o.buildingName = this.gamestate.getSelectedBuildingName();
+      o.targetAmount = parseNumber(this.targetAmount.value);
+    });
+    this.storageService.setSubject$.subscribe(
+        // TODO: move buildingName to gamestate component
+        o => this.targetAmount.setValue(
+            fromNumber(o.request?.objective?.targetAmount)));
+  }
 
   sendRequest() {
-    const request = new pb.RunRequest();
-    request.state = this.storageService.get().request!.state;
-    request.objective = new pb.Objective();
-    request.objective.buildingName = this.gamestate.getSelectedBuildingName();
-    request.objective.targetAmount = parseNumber(this.targetAmount.value);
+    const request = this.storageService.get().request!;
     request.randSeed = 42;
     request.iterationReportInterval = 1000000;
 
