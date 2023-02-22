@@ -4,7 +4,7 @@ package wiring;
 
 // Next ID: 8
 message Building {
-  string name = 7;
+  string id = 7;
 
   double current_amount = 1;
 
@@ -60,7 +60,7 @@ message Building {
 message State { repeated Building buildings = 1; }
 
 message Objective {
-  string building_name = 1;
+  string building_id = 1;
   double target_amount = 2;
 }
 

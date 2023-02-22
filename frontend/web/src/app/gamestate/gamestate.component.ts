@@ -96,7 +96,8 @@ export function fromNumber(v: number|undefined) {
 }
 
 class Building {
-  name = "";
+  id = "";
+	buildingName = "";
 
   incomeAmount = new FormControl<string>("");
   incomeUnit = new FormControl<string>("");
@@ -111,7 +112,8 @@ class Building {
 }
 function makeBuilding(cityName: string, buildingName: string): Building {
   var o = new Building();
-  o.name = cityName + "." + buildingName;
+  o.id = cityName + "." + buildingName;
+	o.buildingName = buildingName;
   return o;
 }
 
@@ -152,6 +154,7 @@ export class GamestateComponent {
                makeBuilding("automn", "unit9"),
              ])
   ];
+
   public currentCityIndex = 0;
   public currentBuildingIndex = 0;
 
@@ -162,11 +165,11 @@ export class GamestateComponent {
       v.request!.state = this.buildState();
 
       v.request!.objective ??= new pb.Objective();
-      v.request!.objective.buildingName = this.getSelectedBuildingName();
+      v.request!.objective.buildingId = this.getSelectedBuildingId();
     });
     this.storageService.setSubject$.subscribe(o => {
       this.setState(o.request!.state!);
-      this.selectBuilding(o.request!.objective!.buildingName);
+      this.selectBuilding(o.request!.objective!.buildingId);
     });
   }
 
@@ -190,7 +193,7 @@ export class GamestateComponent {
   private buildBuilding(building: Building): pb.Building {
     var ret = new pb.Building();
 
-    ret.name = building.name;
+    ret.id = building.id;
     ret.currentAmount = 0;
     ret.elapsedTime = 0;
 
@@ -224,11 +227,11 @@ export class GamestateComponent {
     return ret;
   }
 
-  private getPbBuilding(state: pb.State, buildingName: string): pb.Building {
+  private getPbBuilding(state: pb.State, buildingId: string): pb.Building {
     var found: pb.Building|undefined;
     if (state.buildings != undefined) {
       state.buildings.forEach(pbBuilding => {
-        if (pbBuilding.name == buildingName) {
+        if (pbBuilding.id == buildingId) {
           found = pbBuilding;
         }
       })
@@ -239,7 +242,7 @@ export class GamestateComponent {
   setState(state: pb.State) {
     this.cities.forEach(
         city => {city.buildings.forEach(building => {
-          this.loadBuilding(building, this.getPbBuilding(state, building.name));
+          this.loadBuilding(building, this.getPbBuilding(state, building.id));
         })});
   }
 
@@ -252,20 +255,19 @@ export class GamestateComponent {
     return state;
   }
 
-  getSelectedBuildingName() {
+  getSelectedBuildingId() {
     const city = this.cities[this.currentCityIndex];
-    return city.buildings[city.currentBuildingIndex].name;
+    return city.buildings[city.currentBuildingIndex].id;
   }
 
-	selectBuilding(buildingName : string) {
-		console.log("trying to select to building: " + buildingName);
-		this.cities.forEach((city, cityIndex) => 
-			city.buildings.forEach((building, buildingIndex) => {
-				if (building.name == buildingName) {
-					this.currentCityIndex = cityIndex;
-					city.currentBuildingIndex = buildingIndex;
-				}
-			})
-		);
-	}
+  selectBuilding(buildingId: string) {
+    console.log("trying to select to building: " + buildingId);
+    this.cities.forEach((city, cityIndex) => city.buildings.forEach(
+                            (building, buildingIndex) => {
+                              if (building.id== buildingId) {
+                                this.currentCityIndex = cityIndex;
+                                city.currentBuildingIndex = buildingIndex;
+                              }
+                            }));
+  }
 }

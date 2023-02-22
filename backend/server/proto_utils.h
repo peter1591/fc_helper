@@ -82,7 +82,7 @@ void fromProtoBuilding(const wiring::Building &in, State &out) {
 
 const wiring::Building* getProtoBuilding(const wiring::State& s, const std::string_view buildingName) {
 	for (const auto& b : s.buildings()) {
-		if (b.name() == buildingName) {
+		if (b.id() == buildingName) {
 			return &b;
 		}
 	}
@@ -94,14 +94,14 @@ AIRequest toAiRequest(const wiring::RunRequest &in) {
 
 	bool found = false;
 	for (const auto& building : in.state().buildings()) {
-		if (building.name() != in.objective().building_name()) {
+		if (building.id() != in.objective().building_id()) {
 			continue;
 		}
 		if (found) {
 			throw std::runtime_error("more than two buildings with the same name");
 		}
 
-		const auto* targetBuilding = getProtoBuilding(in.state(), in.objective().building_name());
+		const auto* targetBuilding = getProtoBuilding(in.state(), in.objective().building_id());
 		if (targetBuilding == nullptr) {
 			throw std::runtime_error("building in the objective is not found");
 		}

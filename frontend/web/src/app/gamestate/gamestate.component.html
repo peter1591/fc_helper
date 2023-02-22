@@ -6,7 +6,7 @@
     <mat-tab-group [(selectedIndex)]="cities[currentCityIndex].currentBuildingIndex">
       <mat-tab
         *ngFor="let building of city.buildings; let buildingIndex = index"
-        [label]="building.name"
+        [label]="building.buildingName"
       >
         <h4>Income</h4>
         <mat-form-field>
