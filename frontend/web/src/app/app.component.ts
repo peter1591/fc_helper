@@ -50,9 +50,8 @@ export class AppComponent {
   }
 
   private processResponse(response: pb.RunResponse) {
-    this.postMessage('got response: ' + JSON.stringify(response.toJSON()));
-
     if (response.bestStrategy) {
+			this.postMessage('got response: ' + JSON.stringify(response.toJSON()));
       this.bestActions = response.bestStrategy.actions ??
                          [ pb.RunResponse.BestStrategy.Action.ACTION_UNSET ];
     }

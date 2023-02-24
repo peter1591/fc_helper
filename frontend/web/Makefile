@@ -4,7 +4,7 @@ all: proto
 proto:
 	npm run proto:generate
 
-dist:
+dist: all
 	rm -rf /var/www/html/*
 	cp -R dist/web/* /var/www/html/
 
