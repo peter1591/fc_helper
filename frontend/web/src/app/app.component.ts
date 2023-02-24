@@ -18,6 +18,7 @@ export class AppComponent {
   bestActions: pb.RunResponse.BestStrategy.Action[] = [];
 
   targetAmount = new FormControl<string>("");
+	resultProgress = 0;
 
   constructor(
       private client: AIServiceClient,
@@ -36,7 +37,7 @@ export class AppComponent {
   sendRequest() {
     const request = this.storageService.get().request!;
     request.randSeed = 42;
-    request.iterationReportInterval = 1000000;
+		this.resultProgress = 0;
 
     this.postMessage('sending request: ' + JSON.stringify(request.toJSON()));
 
@@ -55,6 +56,10 @@ export class AppComponent {
       this.bestActions = response.bestStrategy.actions ??
                          [ pb.RunResponse.BestStrategy.Action.ACTION_UNSET ];
     }
+		if (response.progressInfo) {
+			var rest = response.progressInfo.newNodeCount / response.progressInfo.newNodeCountMax;
+			this.resultProgress = 100 * (1-rest);
+		}
   }
 
   private processError(error: GrpcStatusEvent) {

@@ -4,11 +4,7 @@
 <h4>Optimize</h4>
 <mat-form-field>
   <mat-label>target amount</mat-label>
-  <input
-    matInput
-    type="text"
-    [formControl]="targetAmount"
-  />
+  <input matInput type="text" [formControl]="targetAmount" />
 </mat-form-field>
 <button type="button" (click)="sendRequest()">
   Start
@@ -16,9 +12,15 @@
 
 <h4>Result</h4>
 <div>
+  <mat-progress-bar
+    mode="determinate"
+    [value]="resultProgress"
+  ></mat-progress-bar>
+</div>
+<div>
   Best actions:
-  <ng-container *ngFor="let action of bestActions">
-    {{ action }},
+  <ng-container *ngFor="let bestAction of bestActions">
+    {{ bestAction }},
   </ng-container>
 </div>
 

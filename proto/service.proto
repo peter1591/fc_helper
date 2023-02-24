@@ -69,7 +69,8 @@ message RunRequest {
   State state = 1;
   Objective objective = 4;
   int32 rand_seed = 2;
-  int32 iteration_report_interval = 3;
+
+	reserved 3;
 }
 
 message RunResponse {

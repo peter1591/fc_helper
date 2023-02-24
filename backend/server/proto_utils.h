@@ -119,7 +119,6 @@ AIRequest toAiRequest(const wiring::RunRequest &in) {
 	printState(out.state);
 
   out.rand_seed = in.rand_seed();
-  out.iteration_report_interval = in.iteration_report_interval();
   return out;
 }
 

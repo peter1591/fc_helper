@@ -9,6 +9,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatListModule} from '@angular/material/list';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 import {MatSelectModule} from '@angular/material/select';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import {MatTabsModule} from '@angular/material/tabs';
@@ -24,8 +25,7 @@ import {GamestateComponent} from './gamestate/gamestate.component';
 import {PresetsComponent} from './presets/presets.component';
 
 @NgModule({
-  declarations :
-      [ AppComponent, GamestateComponent, PresetsComponent],
+  declarations : [ AppComponent, GamestateComponent, PresetsComponent ],
   imports : [
     BrowserModule,
     FormsModule,
@@ -53,7 +53,8 @@ import {PresetsComponent} from './presets/presets.component';
     MatListModule,
     MatFormFieldModule,
     MatSelectModule,
-		ScrollingModule,
+    ScrollingModule,
+    MatProgressBarModule,
   ],
   providers : [],
   bootstrap : [ AppComponent ]

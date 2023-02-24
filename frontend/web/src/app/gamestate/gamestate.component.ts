@@ -215,7 +215,7 @@ export class GamestateComponent {
         parseNumber(building.upgradeAmountMultiplyUpgrades.value);
     ret.upgradeAmount.multiply.multiply =
         parseNumber(building.upgradeAmountMultiplyMultiply.value);
-    ret.upgradeAmount.availables = ret.upgradeAmount.multiply.upgrades + 1;
+    ret.upgradeAmount.availables = 10;
 
     ret.upgradeTime = new pb.Building.UpgradeTime();
     ret.upgradeTime.cost = parseNumber(building.upgradeTimeCost.value);

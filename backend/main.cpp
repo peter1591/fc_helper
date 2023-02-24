@@ -176,7 +176,6 @@ int main(void) {
       AIRequest{
           .state = initialState,
           .rand_seed = 42,
-          .iteration_report_interval = 100000,
       },
       [&](const AIResult &result) {
         if (std::holds_alternative<BestStrategy>(result)) {
